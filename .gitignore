@@ -1,0 +1,50 @@
+```
+# Model and data files
+*.safetensors
+*.bin
+*.pth
+*.ckpt
+*.onnx
+*.pb
+
+# Dependencies
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.conda/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage/
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+```
