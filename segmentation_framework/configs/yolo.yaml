@@ -1,0 +1,108 @@
+# YOLOv8-Seg Configuration for SWIR Vitrox Board Inspection
+# Optimized for CPU training with curriculum learning
+
+model:
+  name: "yolov8n-seg"  # Options: yolov8n-seg, yolov8s-seg, yolov8m-seg
+  num_classes: 5
+  pretrained: true
+  input_size: 640  # Multiple of 32
+  
+training:
+  epochs: 100
+  batch_size: 4  # Reduced for CPU training
+  learning_rate: 0.01  # Optimal for YOLO
+  weight_decay: 0.0005
+  momentum: 0.937
+  warmup_epochs: 3
+  warmup_lr_start: 0.0
+  optimizer: "adamw"
+  scheduler: "cosine"
+  patience: 20
+  gradient_clip: 1.0
+  mixed_precision: false  # Keep false for CPU
+  
+data:
+  root_dir: "data"
+  raw_dir: "raw"
+  processed_dir: "processed"
+  splits_dir: "splits"
+  train_split: "train.txt"
+  val_split: "val.txt"
+  test_split: "test.txt"
+  num_workers: 2  # Reduced for CPU
+  pin_memory: false
+  
+classes:
+  background: 0
+  die: 1
+  scratches: 2
+  contamination: 3
+  other_defects: 4
+
+augmentation:
+  curriculum_epoch: 2  # Apply dynamic augmentations every 2 epochs
+  
+  static:
+    rotations: [0, 90, 180, 270]
+    flips: ["x", "y", "xy"]
+    random_crop: true
+    crop_size_ratio: 0.9
+    prob_rotation: 0.5
+    prob_flip: 0.5
+    prob_crop: 0.3
+    
+  dynamic:
+    enabled: true
+    shift_range: 0.1
+    rotation_range: 15
+    blur_limit: 3
+    blur_prob: 0.3
+    sharpen_alpha: 0.2
+    sharpen_lightness: 0.5
+    sharpen_prob: 0.3
+    intensity_offset: 0.1
+    intensity_prob: 0.3
+    contrast_scale: 0.1
+    contrast_prob: 0.3
+    gamma_range: [0.8, 1.2]
+    gamma_prob: 0.2
+    elastic_alpha: 30
+    elastic_sigma: 4
+    elastic_prob: 0.2
+    grid_distort_num_steps: 5
+    grid_distort_range: 0.1
+    grid_distort_prob: 0.2
+    noise_scale: 0.05
+    noise_prob: 0.2
+    motion_blur_limit: 5
+    motion_blur_prob: 0.1
+    defocus_blur_radius: 3
+    defocus_blur_prob: 0.1
+    cutout_num_holes: 8
+    cutout_max_h_size: 32
+    cutout_min_h_size: 16
+    cutout_prob: 0.1
+    
+  border_mode: "mirror"
+  
+experiment:
+  name: "yolo_vitrox_inspection"
+  log_dir: "outputs/experiments"
+  checkpoint_dir: "outputs/checkpoints"
+  prediction_dir: "outputs/predictions"
+  visualization_dir: "outputs/visualizations"
+  tensorboard: true
+  save_frequency: 10
+  save_best_only: true
+  monitor_metric: "miou"
+  
+evaluation:
+  metrics: ["miou", "dice", "f1", "precision", "recall", "accuracy"]
+  visualize_predictions: true
+  num_visualization_samples: 10
+  
+device:
+  use_cuda: false  # CPU training
+  cuda_device: 0
+  deterministic: false
+  seed: 42

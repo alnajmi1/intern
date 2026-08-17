@@ -1,0 +1,137 @@
+# Default Configuration for Segmentation Framework
+# This is the base configuration file with all default values
+
+# Model selection: yolo, segformer, sam
+model:
+  name: "yolov8n-seg"  # Options: yolov8n-seg, yolov8s-seg, yolov8m-seg, segformer-b0, segformer-b1, segformer-b2, sam-vit-b
+  num_classes: 5
+  pretrained: true
+  input_size: 640  # Must be multiple of 32 for most architectures
+  
+# Training configuration
+training:
+  epochs: 100
+  batch_size: 8
+  learning_rate: 0.01  # Default for YOLO; SegFormer uses 0.00005
+  weight_decay: 0.0005
+  momentum: 0.937
+  warmup_epochs: 3
+  warmup_lr_start: 0.0
+  optimizer: "adamw"  # Options: adamw, sgd, adam
+  scheduler: "cosine"  # Options: cosine, step, linear, none
+  patience: 20  # Early stopping patience
+  gradient_clip: 1.0
+  mixed_precision: false  # Set to true for GPU training
+  
+# Data configuration
+data:
+  root_dir: "data"
+  raw_dir: "raw"
+  processed_dir: "processed"
+  splits_dir: "splits"
+  train_split: "train.txt"
+  val_split: "val.txt"
+  test_split: "test.txt"
+  num_workers: 4
+  pin_memory: false
+  
+# Classes (order matters - indices must match)
+classes:
+  background: 0
+  die: 1
+  scratches: 2
+  contamination: 3
+  other_defects: 4
+
+# Augmentation configuration
+augmentation:
+  # Apply dynamic augmentations every N epochs (curriculum learning)
+  curriculum_epoch: 2
+  
+  # Static augmentations (applied every epoch)
+  static:
+    # Rotation angles in degrees
+    rotations: [0, 90, 180, 270]
+    # Flip types
+    flips: ["x", "y", "xy"]  # Options: x, y, xy
+    # Random crop settings
+    random_crop: true
+    crop_size_ratio: 0.9  # Crop to 90% of original size
+    # Probability of applying each augmentation
+    prob_rotation: 0.5
+    prob_flip: 0.5
+    prob_crop: 0.3
+    
+  # Dynamic augmentations (applied every curriculum_epoch epochs)
+  dynamic:
+    enabled: true
+    # Small XY shift (as fraction of image size)
+    shift_range: 0.1  # ±10% shift
+    # Small rotation (degrees)
+    rotation_range: 15  # ±15 degrees
+    # Gaussian blur
+    blur_limit: 3  # Kernel size limit
+    blur_prob: 0.3
+    # Sharpening (unsharp mask)
+    sharpen_alpha: 0.2
+    sharpen_lightness: 0.5
+    sharpen_prob: 0.3
+    # Intensity offsets
+    intensity_offset: 0.1  # ±10% intensity change
+    intensity_prob: 0.3
+    # Contrast stretch (scaling)
+    contrast_scale: 0.1  # ±10% contrast change
+    contrast_prob: 0.3
+    # Gamma correction
+    gamma_range: [0.8, 1.2]
+    gamma_prob: 0.2
+    # Elastic transform
+    elastic_alpha: 30
+    elastic_sigma: 4
+    elastic_prob: 0.2
+    # Grid distortion
+    grid_distort_num_steps: 5
+    grid_distort_range: 0.1
+    grid_distort_prob: 0.2
+    # Noise
+    noise_scale: 0.05
+    noise_prob: 0.2
+    # Motion blur
+    motion_blur_limit: 5
+    motion_blur_prob: 0.1
+    # Defocus blur
+    defocus_blur_radius: 3
+    defocus_blur_prob: 0.1
+    # Cutout / Coarse dropout
+    cutout_num_holes: 8
+    cutout_max_h_size: 32
+    cutout_min_h_size: 16
+    cutout_prob: 0.1
+    
+  # Border mode for geometric transformations
+  border_mode: "mirror"  # Options: mirror, constant, reflect, replicate
+  
+# Experiment tracking
+experiment:
+  name: "default_experiment"
+  log_dir: "outputs/experiments"
+  checkpoint_dir: "outputs/checkpoints"
+  prediction_dir: "outputs/predictions"
+  visualization_dir: "outputs/visualizations"
+  tensorboard: true
+  save_frequency: 10  # Save checkpoint every N epochs
+  save_best_only: true
+  monitor_metric: "miou"  # Options: miou, loss, dice, f1
+  
+# Evaluation configuration
+evaluation:
+  metrics: ["miou", "dice", "f1", "precision", "recall", "accuracy"]
+  visualize_predictions: true
+  num_visualization_samples: 10
+  
+# Device configuration
+device:
+  use_cuda: false  # Set to true if GPU available
+  cuda_device: 0
+  deterministic: false  # For reproducibility
+  seed: 42

@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "segmentation-framework"
+version = "0.1.0"
+description = "Industrial segmentation framework for SWIR Vitrox board inspection"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Industrial AI Team", email = "ai@vitrox.com"}
+]
+keywords = [
+    "segmentation",
+    "computer-vision",
+    "industrial-inspection",
+    "SWIR",
+    "YOLO",
+    "SegFormer",
+    "SAM"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "albumentations>=1.3.0",
+    "opencv-python>=4.8.0",
+    "Pillow>=10.0.0",
+    "numpy>=1.24.0",
+    "pyyaml>=6.0",
+    "tqdm>=4.65.0",
+    "tensorboard>=2.13.0",
+    "matplotlib>=3.7.0",
+    "scikit-learn>=1.3.0",
+    "pydantic>=2.0.0",
+    "ultralytics>=8.0.0",
+    "transformers>=4.30.0",
+    "segmentation-models-pytorch>=0.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.4.0",
+]
+sam = [
+    "segment-anything>=1.0.0",
+]
+
+[project.scripts]
+segtrain = "segmentation.cli.main:main"
+
+[project.urls]
+Homepage = "https://github.com/vitrox/segmentation-framework"
+Documentation = "https://github.com/vitrox/segmentation-framework#readme"
+Repository = "https://github.com/vitrox/segmentation-framework.git"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true

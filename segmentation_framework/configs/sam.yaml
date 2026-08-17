@@ -1,0 +1,109 @@
+# Segment Anything Model (SAM) Configuration for SWIR Vitrox Board Inspection
+# Note: SAM is primarily for interactive/few-shot segmentation
+# CPU training not recommended - use for inference only
+
+model:
+  name: "sam-vit-b"  # Options: sam-vit-b, sam-vit-l, sam-vit-h
+  num_classes: 5
+  pretrained: true
+  input_size: 1024  # SAM requires 1024x1024 input
+  
+training:
+  epochs: 50
+  batch_size: 1  # SAM is very memory-intensive
+  learning_rate: 0.00001
+  weight_decay: 0.0
+  momentum: 0.9
+  warmup_epochs: 5
+  warmup_lr_start: 0.0
+  optimizer: "adamw"
+  scheduler: "cosine"
+  patience: 30
+  gradient_clip: 1.0
+  mixed_precision: false
+  
+data:
+  root_dir: "data"
+  raw_dir: "raw"
+  processed_dir: "processed"
+  splits_dir: "splits"
+  train_split: "train.txt"
+  val_split: "val.txt"
+  test_split: "test.txt"
+  num_workers: 2
+  pin_memory: false
+  
+classes:
+  background: 0
+  die: 1
+  scratches: 2
+  contamination: 3
+  other_defects: 4
+
+augmentation:
+  curriculum_epoch: 2
+  
+  static:
+    rotations: [0, 90, 180, 270]
+    flips: ["x", "y", "xy"]
+    random_crop: true
+    crop_size_ratio: 0.9
+    prob_rotation: 0.5
+    prob_flip: 0.5
+    prob_crop: 0.3
+    
+  dynamic:
+    enabled: true
+    shift_range: 0.05  # Smaller shifts for SAM
+    rotation_range: 10
+    blur_limit: 3
+    blur_prob: 0.2
+    sharpen_alpha: 0.1
+    sharpen_lightness: 0.5
+    sharpen_prob: 0.2
+    intensity_offset: 0.05
+    intensity_prob: 0.2
+    contrast_scale: 0.05
+    contrast_prob: 0.2
+    gamma_range: [0.9, 1.1]
+    gamma_prob: 0.1
+    elastic_alpha: 20
+    elastic_sigma: 3
+    elastic_prob: 0.1
+    grid_distort_num_steps: 5
+    grid_distort_range: 0.05
+    grid_distort_prob: 0.1
+    noise_scale: 0.03
+    noise_prob: 0.1
+    motion_blur_limit: 3
+    motion_blur_prob: 0.05
+    defocus_blur_radius: 2
+    defocus_blur_prob: 0.05
+    cutout_num_holes: 4
+    cutout_max_h_size: 16
+    cutout_min_h_size: 8
+    cutout_prob: 0.05
+    
+  border_mode: "mirror"
+  
+experiment:
+  name: "sam_vitrox_inspection"
+  log_dir: "outputs/experiments"
+  checkpoint_dir: "outputs/checkpoints"
+  prediction_dir: "outputs/predictions"
+  visualization_dir: "outputs/visualizations"
+  tensorboard: true
+  save_frequency: 10
+  save_best_only: true
+  monitor_metric: "miou"
+  
+evaluation:
+  metrics: ["miou", "dice", "f1", "precision", "recall", "accuracy"]
+  visualize_predictions: true
+  num_visualization_samples: 10
+  
+device:
+  use_cuda: false  # WARNING: SAM really needs GPU for training
+  cuda_device: 0
+  deterministic: false
+  seed: 42
